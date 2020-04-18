@@ -1,0 +1,139 @@
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: Deployable
+metadata:
+  name: mcm-finance-deployable-deployment-redis
+  namespace: mcm-finance-channel-ns
+  annotations:
+    app.ibm.com/is-local-deployable: "false"  
+  labels:
+    app: mcm-finance-application
+    subApp: web
+spec:
+  template:
+    kind: StatefulSet
+    apiVersion: apps/v1
+    metadata:
+      name: mcm-finance-redis
+      namespace: mcm-finance-app-ns
+    spec:
+      selector:
+        matchLabels:
+          app: mcm-finance-application
+          subname: redis
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: mcm-finance-application
+            subname: redis
+        spec:
+          # initContainers:
+          #   - name: install
+          #     image: harbor-001.jimmysong.io/library/redis-install-3.2.0:e2e
+          #     imagePullPolicy: Always
+          #     args:
+          #     - "--install-into=/opt"
+          #     - "--work-dir=/work-dir"
+          #     volumeMounts:
+          #     - name: opt
+          #       mountPath: "/opt"
+          #     - name: workdir
+          #       mountPath: "/work-dir"
+          #   - name: bootstrap
+          #     image: harbor-001.jimmysong.io/library/debian:jessie
+          #     command:
+          #     - "/work-dir/peer-finder"
+          #     args:
+          #     - -on-start="/work-dir/on-start.sh"
+          #     - "-service=redis"
+          #     env:
+          #     - name: POD_NAMESPACE
+          #       valueFrom:
+          #         fieldRef:
+          #           apiVersion: v1
+          #           fieldPath: metadata.namespace
+          #     volumeMounts:
+          #     - name: opt
+          #       mountPath: "/opt"
+          #     - name: workdir
+          #       mountPath: "/work-dir"
+          containers:
+          - name: redis
+            image: redis:5.0.4
+            command: ["redis-server", "--appendonly", "yes"]
+            ports:
+            - containerPort: 6379
+              name: web
+            volumeMounts:
+            - name: local-vol
+              mountPath: /tmp
+      volumeClaimTemplates:
+      - metadata:
+          name: local-vol
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: "mcm-finance-redis-storageclass"
+          resources:
+            requests:
+              storage: 1Gi
+---
+# A headless service to create DNS records
+apiVersion: app.ibm.com/v1alpha1
+kind: Deployable
+metadata:
+  name: mcm-finance-deployable-service-redis
+  namespace: mcm-finance-channel-ns
+  annotations:
+    app.ibm.com/is-local-deployable: "false"  
+  labels:
+    app: mcm-finance-application
+    subApp: web
+spec:
+  template:
+    kind: Service
+    apiVersion: v1
+    metadata:
+      annotations:
+        service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+      name: mcm-finance-redis
+      namespace: mcm-finance-app-ns
+      labels:
+        app: mcm-finance-application
+        subname: redis      
+    spec:
+      type: ClusterIP
+      ports:
+        - name: peer
+          port: 6379
+          targetPort: 8080
+      clusterIP: None
+      selector:
+        app: mcm-finance-application
+        subname: redis
+---
+  apiVersion: app.ibm.com/v1alpha1
+  kind: Deployable
+  metadata:
+    name: mcm-finance-deployable-storageclass-redis
+    namespace: mcm-finance-channel-ns
+    annotations:
+      app.ibm.com/is-local-deployable: "false"  
+    labels:
+      app: mcm-finance-application
+      subApp: web
+  spec:
+    template:
+      kind: StorageClass
+      apiVersion: storage.k8s.io/v1
+      metadata:
+        annotations:
+          service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+        name: mcm-finance-redis-storageclass
+        # namespace: mcm-finance-app-ns
+        labels:
+          app: mcm-finance-application
+          subname: redis      
+      spec:
+        provisioner: kubernetes.io/no-provisioner
+        volumeBindingMode: WaitForFirstConsumer

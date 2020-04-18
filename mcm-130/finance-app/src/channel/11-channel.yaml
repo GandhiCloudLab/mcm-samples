@@ -1,0 +1,13 @@
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: Channel
+metadata:
+  name: mcm-finance-channel
+  namespace: mcm-finance-channel-ns
+  labels:
+    app: mcm-finance-application
+spec:
+  type: Namespace
+  pathname: mcm-finance-channel-ns
+  sourceNamespaces:
+    - mcm-finance-app-ns

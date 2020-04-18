@@ -1,0 +1,52 @@
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: Deployable
+metadata:
+  name: mcm-finance-deployable-configmap-web
+  namespace: mcm-finance-channel-ns
+  annotations:
+    app.ibm.com/is-local-deployable: "false"  
+  labels:
+    app: mcm-finance-application
+    subApp: web
+spec:
+  template:
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: mcm-finance-web
+      namespace: mcm-finance-app-ns
+      labels:
+        app: mcm-finance-application
+        subname: web
+    type: Opaque
+    data:
+      prop.api.server.url1: http://abcd.com
+      prop.api.server.url2: http://xyz.com
+      ibm.mq.channel: DEV.APP.SVRCONN
+      ibm.mq.queueManager: QM1
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: Deployable
+metadata:
+  name: mcm-finance-deployable-secret-web
+  namespace: mcm-finance-channel-ns
+  annotations:
+    app.ibm.com/is-local-deployable: "false"  
+  labels:
+    app: mcm-finance-application
+    subApp: web
+spec:
+  template:
+    kind: Secret
+    apiVersion: v1
+    metadata:
+      name: mcm-finance-web
+      namespace: mcm-finance-app-ns
+      labels:
+        app: mcm-finance-application
+        subname: web
+    type: kubernetes.io/dockerconfigjson
+    data:
+      .dockerconfigjson: eyJhdXRocyI6eyJldWNsdXN0ZXIuaWNwOjg1MDAiOnsidXNlcm5hbWUiOiJhZG1pbiIsInBhc3N3b3JkIjoiSUNQYWRtaW4wMSIsImVtYWlsIjoibnVsbCIsImF1dGgiOiJZV1J0YVc0NlNVTlFZV1J0YVc0d01RPT0ifX19
+

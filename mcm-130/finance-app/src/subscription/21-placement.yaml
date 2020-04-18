@@ -1,0 +1,17 @@
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: PlacementRule
+metadata:
+  name: mcm-finance-web
+  namespace: mcm-finance-subscription-ns
+  labels:
+    app: mcm-finance-application
+spec:
+  clusterReplicas: 1
+  clusterLabels:
+    matchExpressions:
+      - key: cloud
+        operator: In
+        values:
+        - IBM
+       

@@ -1,0 +1,45 @@
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: Deployable
+metadata:
+  name: mcm-finance-deployable-deployment-redis
+  namespace: mcm-finance-channel-ns
+  annotations:
+    app.ibm.com/is-local-deployable: "false"  
+  labels:
+    app: mcm-finance-application
+    subApp: web
+spec:
+  template:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      name: mcm-finance-appstore
+      namespace: mcm-finance-app-ns
+    spec:
+      serviceName: "local-service-appstore"
+      replicas: 2
+      selector:
+        matchLabels:
+          app: mcm-finance-application
+          subname: appstore
+      template:
+        metadata:
+          labels:
+            app: mcm-finance-application
+            subname: appstore
+        spec:
+          containers:
+          - name: container-web
+            image: "gandhicloud/g-app-store"
+            imagePullPolicy: Always
+            ports:
+              - name: http
+                containerPort: 8080
+                protocol: TCP
+              - name: https
+                containerPort: 8082
+            env:
+            - name: GET_HOSTS_FROM
+              value: dns
+---

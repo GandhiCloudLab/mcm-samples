@@ -1,0 +1,27 @@
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: Subscription
+metadata:
+  name: subscription-mcm-finance-web
+  namespace: mcm-finance-subscription-ns
+  labels:
+    app: mcm-finance-application
+spec:
+  channel: mcm-finance-channel-ns/mcm-finance-channel
+  packageFilter:
+    version: ">=1.x"
+    labelSelector:
+      matchLabels:
+        app: mcm-finance-application
+        subApp: web
+  placement:
+    placementRef:
+      name: mcm-finance-web
+      kind: PlacementRule
+      group: app.ibm.com
+  overrides:
+  - clusterName: "/"
+    clusterOverrides:
+    - path: "metadata.namespace"
+      value: mcm-finance-app-ns      
+  

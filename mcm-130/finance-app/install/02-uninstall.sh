@@ -10,9 +10,7 @@ kubectl delete -f 21-placement.yaml
 kubectl delete -f 11-application.yaml
 
 cd ../channel
-kubectl delete -f 25-deployable-statefulset-appstore.yaml
-kubectl delete -f 24-deployable-statefulset-busy-box.yaml
-kubectl delete -f 23-deployable-statefulset-redis.yaml
+kubectl delete -f 23-deployable-statefulset-appstore.yaml
 kubectl delete -f 22-deployable-web.yaml
 kubectl delete -f 21-deployable-configmap.yaml
 kubectl delete -f 11-channel.yaml

@@ -13,7 +13,6 @@ spec:
     labelSelector:
       matchLabels:
         app: mcm-finance-application
-        subApp: web
   placement:
     placementRef:
       name: mcm-finance-web

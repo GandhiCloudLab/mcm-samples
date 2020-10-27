@@ -8,7 +8,6 @@ metadata:
     app.ibm.com/is-local-deployable: "false"  
   labels:
     app: mcm-finance-application
-    subApp: web
 spec:
   template:
     kind: ConfigMap
@@ -35,7 +34,6 @@ metadata:
     app.ibm.com/is-local-deployable: "false"  
   labels:
     app: mcm-finance-application
-    subApp: web
 spec:
   template:
     kind: Secret
